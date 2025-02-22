@@ -1,81 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earn $5 Over and Over Again!</title>
+    <title>App de Control del Clima</title>
+    
+    <!-- Incluir librerías externas para iconos y estilos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"> <!-- FontAwesome para iconos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap para estilo -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"> <!-- Fuente Roboto -->
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
             color: #fff;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            max-width: 600px;
-            margin: auto;
-            background: rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+            margin: 100px auto;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
         }
-        h1 {
-            color: #f8b400;
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
         }
-        p {
-            font-size: 18px;
-            margin: 10px 0;
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
         }
-        .cta-button {
-            display: inline-block;
-            background: #f8b400;
-            color: #1a1a2e;
-            padding: 15px 20px;
-            text-decoration: none;
+        .weather-info {
+            text-align: center;
+        }
+        .weather-info .temperature {
+            font-size: 5rem;
             font-weight: bold;
-            border-radius: 5px;
-            transition: 0.3s;
         }
-        .cta-button:hover {
-            background: #ffcc00;
+        .weather-info i {
+            font-size: 2.5rem;
+            margin-top: 10px;
         }
-        .proof-input {
-            margin-top: 20px;
+        .form-control {
+            border-radius: 25px;
+            padding: 15px;
+            background-color: #fff;
+            color: #333;
         }
-        input, button {
-            padding: 10px;
-            font-size: 16px;
-            margin: 5px;
-            border-radius: 5px;
+        .btn-search {
+            margin-top: 10px;
+            background-color: #0072ff;
             border: none;
+            border-radius: 25px;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1rem;
+            width: 100%;
         }
-        button {
-            background: #f8b400;
-            cursor: pointer;
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9rem;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Earn $5 Over and Over Again!</h1>
-        <p>Complete the offer below and receive $5 each time you do it!</p>
-        <p>Click the button to start:</p>
-        <a href="https://eradictrkr.com/pauldev" class="cta-button" target="_blank" onclick="window.open(this.href, '_blank', 'width=800,height=600'); return false;">Complete the Offer Now</a>
-        <p class="proof-input">Once completed, submit the link of the last page as proof:</p>
-        <input type="text" placeholder="Paste your proof link here" id="proof-link">
-        <button onclick="submitProof()">Submit Proof</button>
+        <div class="header">
+            <h1>Clima Actual</h1>
+            <p>Obtén información precisa sobre el clima de cualquier ciudad</p>
+        </div>
+
+        <!-- Input para buscar ciudad -->
+        <input type="text" id="city" class="form-control" placeholder="Introduce una ciudad..." />
+        <button id="search-btn" class="btn-search">Buscar Clima</button>
+
+        <div class="weather-info">
+            <!-- Información del clima -->
+            <div id="temperature" class="temperature">--°C</div>
+            <div id="weather-icon"><i class="fas fa-cloud-sun"></i></div>
+            <div id="description">--</div>
+        </div>
+
+        <div class="footer">
+            <p>Desarrollado con ❤️ por tu marido <a href="https://www.example.com" target="_blank"></a></p>
+        </div>
     </div>
 
+    <!-- Librerías externas -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function submitProof() {
-            let proof = document.getElementById("proof-link").value;
-            if(proof) {
-                alert("Proof submitted successfully! We will verify your submission.");
-            } else {
-                alert("Please enter a valid proof link.");
+        const apiKey = "6b2fb166cd3eaca8d5c242249c81fe5b"; // Tu clave API
+
+        $("#search-btn").click(function() {
+            const city = $("#city").val();
+            if (city === "") {
+                alert("Por favor, introduce una ciudad.");
+                return;
             }
-        }
+
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=es`;
+            $.get(url, function(data) {
+                // Mostrar el clima
+                const temp = Math.round(data.main.temp);
+                const description = data.weather[0].description;
+                const iconCode = data.weather[0].icon;
+                
+                $("#temperature").text(`${temp}°C`);
+                $("#description").text(description.charAt(0).toUpperCase() + description.slice(1));
+                
+                // Cambiar icono de clima
+                $("#weather-icon").html(`<img src="http://openweathermap.org/img/wn/${iconCode}.png" alt="Icono del clima" />`);
+            }).fail(function() {
+                alert("No se pudo obtener el clima. Verifica el nombre de la ciudad.");
+            });
+        });
     </script>
 </body>
 </html>
+
